@@ -7,6 +7,7 @@ from dao import Dao
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 import sys
+import argparse
 import rankings
 import tournament_import_service as tournament_import
 from pymongo import MongoClient
@@ -38,18 +39,17 @@ matches_get_parser.add_argument('opponent', type=str)
 rankings_get_parser = reqparse.RequestParser()
 rankings_get_parser.add_argument('generateNew', type=str)
 
-<<<<<<< HEAD
+player_put_parser = reqparse.RequestParser()
+player_put_parser.add_argument('name', type=str)
+player_put_parser.add_argument('aliases', type=list)
+player_put_parser.add_argument('regions', type=list)
+
 tournament_import_parser = reqparse.RequestParser()
 tournament_import_parser.add_argument('tournament_name', type=str, required=True, location='form', help="Tournament must have a name.")
 tournament_import_parser.add_argument('bracket_type', type=str, required=True, location='form', help="Bracket must have a type.")
 tournament_import_parser.add_argument('challonge_url', type=str, location='form')
 tournament_import_parser.add_argument('tio_file', type=str, location='form')
 tournament_import_parser.add_argument('tio_bracket_name', type=str, location='form')
-=======
-player_put_parser = reqparse.RequestParser()
-player_put_parser.add_argument('name', type=str)
-player_put_parser.add_argument('aliases', type=list)
-player_put_parser.add_argument('regions', type=list)
 
 tournament_put_parser = reqparse.RequestParser()
 tournament_put_parser.add_argument('name', type=str)
@@ -57,7 +57,6 @@ tournament_put_parser.add_argument('date', type=int)
 tournament_put_parser.add_argument('players', type=list)
 tournament_put_parser.add_argument('matches', type=list)
 tournament_put_parser.add_argument('regions', type=list)
->>>>>>> master
 
 class InvalidAccessToken(Exception):
     pass
@@ -494,5 +493,10 @@ api.add_resource(RankingsResource, '/<string:region>/rankings')
 api.add_resource(CurrentUserResource, '/users/me')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(sys.argv[1]), debug=(sys.argv[2] == 'True'))
+    parser = argparse.ArgumentParser(description='Starts the GarPR web service.')
+    parser.add_argument("--debug", help="start in debug mode", action="store_true")
+    parser.add_argument('host', nargs='?', default='0.0.0.0')
+    parser.add_argument('port', type=int, nargs='?', default=8080)
+    args = parser.parse_args()
+    app.run(host=args.host, port=args.port, debug=args.debug)
 
